@@ -1,0 +1,14 @@
+{
+  "station": {
+    "2A:36:A5:AC:39:66": {
+      "Join_Time": "05:30:49",
+      "Name": "pritam",
+      "sl_no": 2
+    },
+    "B4:69:21:AC:35:55": {
+      "Join_Time": "16:39:55",
+      "Name": "pritam",
+      "sl_no": 1
+    }
+  }
+}

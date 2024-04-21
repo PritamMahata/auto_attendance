@@ -1,11 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>esp32</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Data Editor</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <h1></h1>
+  <div id="app">
+    <h1>Firebase Data Editor</h1>
+    <div id="filter-sort-options">
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by" onchange="sortData()">
+        <option value="name">Name</option>
+        <option value="joinTime">Join Time</option>
+        <option value="slNo">Serial No</option>
+      </select>
+      <label for="filter-by">Filter by Name:</label>
+      <input type="text" id="filter-by" oninput="filterData()">
+    </div>
+    <div id="add-user-form">
+      <h2>Add User</h2>
+      <input type="text" id="name" placeholder="Name">
+      <input type="text" id="join-time" placeholder="Join Time">
+      <input type="number" id="sl-no" placeholder="Serial No">
+      <button onclick="addUser()">Add User</button>
+    </div>
+    <div id="data-list"></div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="script.js"></script>
+  <script src="fileter.js"></script>
 </body>
+
 </html>
