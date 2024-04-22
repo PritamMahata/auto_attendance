@@ -14,7 +14,6 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800);
 
 String bssid;
-String currentDate = "/22-04-2024/"
 const int maxStations = 10;
 String stationMacs[maxStations];
 int numStations = 0;
@@ -155,17 +154,10 @@ void loop() {
 
   if (Firebase.ready() && WiFi.status() == WL_CONNECTED && count != 0) {
     for (int i = 0; i < numStations; i++) {
-      String path = currentDate + stationMacs[i];
-      
-      // Check if join time has already been set for this client
-      if (!Firebase.getString(firebaseData, (path + "/Join_Time").c_str())) {
-        Firebase.setString(firebaseData, (path + "/Join_Time").c_str(), timeClient.getFormattedTime());
-        Serial.println("Join time set for client: " + stationMacs[i]);
-      }
-      
+      String path = "/station/" + stationMacs[i];
       Firebase.setInt(firebaseData, (path + "/sl_no").c_str(), i + 1);
       Firebase.setString(firebaseData, (path + "/Name").c_str(), name);
-      Firebase.setString(firebaseData, (path + "/Connection_Time").c_str(), String(clients[i].connectionTime / 1000) + "s");      
+      Firebase.setString(firebaseData, (path + "/Connection_Time").c_str(), String(clients[i].connectionTime / 1000) + "s");
       count--;
     }
   }

@@ -11,14 +11,13 @@
 const int ledPin = 2;
 FirebaseData firebaseData;
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800);
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800); // UTC offset for IST is 5 hours and 30 minutes (19800 seconds)
 
 String bssid;
-String currentDate = "/22-04-2024/"
-const int maxStations = 10;
+const int maxStations = 10; // Maximum number of stations to store
 String stationMacs[maxStations];
 int numStations = 0;
-String name = "User_name";
+String name = "pritam";
 int count = 0;
 bool time_calibration = false;
 
@@ -40,7 +39,7 @@ void PrintStations() {
   Serial.print("Number of connected stations: ");
   Serial.println(stationList.num);
 
-  numStations = min(stationList.num, maxStations); // user limit
+  numStations = min(stationList.num, maxStations); // Limit the number of stations to store
 
   for (int i = 0; i < numStations; i++) {
     wifi_sta_info_t station = stationList.sta[i];
@@ -60,8 +59,7 @@ void PrintStations() {
   for (int i = 0; i < numStations; i++) {
     Serial.println(stationMacs[i]);
     bssid = stationMacs[i];
-
-    // check for new user
+    // Check if this is a new station
     bool newStation = true;
     for (int j = 0; j < numClients; j++) {
       if (stationMacs[i] == clients[j].macAddress) {
@@ -79,7 +77,7 @@ void PrintStations() {
     }
   }
 
-  // Update connection time for each user 
+  // Update connection time for each client
   for (int i = 0; i < numClients; i++) {
     bool found = false;
     for (int j = 0; j < numStations; j++) {
@@ -96,17 +94,6 @@ void PrintStations() {
   Serial.println("-----------------");
 }
 
-// LED animations ---------------------------------------------
-
-void light(String state) {
-  if (state == "ON")
-    digitalWrite(LED, HIGH);
-  else if (state == "OFF")
-    digitalWrite(LED, LOW);
-}
-
-// -------------------------------------------
-
 void setup() {
   Serial.begin(115200);
   pinMode(LED, OUTPUT);
@@ -117,12 +104,6 @@ void setup() {
   delay(1000);
 
   WiFi.begin("hotspot", "@pritam123");
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.println("Connecting to WiFi...");
-  }
-
   Serial.println("Wifi connected..........");
   delay(1000);
   
@@ -155,28 +136,18 @@ void loop() {
 
   if (Firebase.ready() && WiFi.status() == WL_CONNECTED && count != 0) {
     for (int i = 0; i < numStations; i++) {
-      String path = currentDate + stationMacs[i];
-      
-      // Check if join time has already been set for this client
-      if (!Firebase.getString(firebaseData, (path + "/Join_Time").c_str())) {
-        Firebase.setString(firebaseData, (path + "/Join_Time").c_str(), timeClient.getFormattedTime());
-        Serial.println("Join time set for client: " + stationMacs[i]);
-      }
-      
-      Firebase.setInt(firebaseData, (path + "/sl_no").c_str(), i + 1);
+      String path = "/station/" + stationMacs[i];
       Firebase.setString(firebaseData, (path + "/Name").c_str(), name);
-      Firebase.setString(firebaseData, (path + "/Connection_Time").c_str(), String(clients[i].connectionTime / 1000) + "s");      
-      count--;
+      Firebase.setInt(firebaseData, (path + "/sl_no").c_str(), i + 1);
+      Firebase.setString(firebaseData, (path + "/Connection_Time").c_str(), String(clients[i].connectionTime / 1000) + "s");
+      
+      count--; 
     }
   }
   else if (count == 0) {
-    light("ON");
-    delay(100);
-    light("OFF");
     Serial.println("all user upload succesfully");
   }
   else {
-    light("ON");
     Serial.println("error");
   }
 }
